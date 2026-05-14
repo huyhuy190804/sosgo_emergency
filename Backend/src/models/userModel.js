@@ -1,0 +1,75 @@
+import mongoose from 'mongoose';
+const emergencyContactSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    relation: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const profileSchema = new mongoose.Schema(
+  {
+    avatar_url: { type: String, default: '' },
+    date_of_birth: { type: Date, default: null },
+    gender: { type: String, default: '' },
+    address: { type: String, default: '' },
+    emergency_contacts: { type: [emergencyContactSchema], default: [] }, 
+    blood_type: { type: String, enum: ['O', 'A', 'B', 'AB', ''], default: '', uppercase: true },
+    height: { type: Number, default: null },
+    weight: { type: Number, default: null },
+    allergies: { type: String, default: '' },
+    medical_history: { type: [String], default: [] },
+  },
+  { _id: false }
+);
+
+const authSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ['OTP', 'Password'], default: 'OTP' },
+    phone: { type: String, default: '' },
+    // Email chỉ dùng cho Password/Rescue/Admin — tránh unique rỗng với OTP
+    email: { type: String },
+    password: { type: String, default: '' },
+    firebase_uid: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const userSchema = new mongoose.Schema(
+  {
+    full_name: { type: String, required: true, default: '', trim: true },
+
+    date_of_birth: { type: Date, default: null },   
+    gender: { type: String, default: '' },  
+    phone: {
+      type: String,
+      sparse: true,
+      unique: true,
+      trim: true,
+      default: undefined,
+      set: (value) => {
+        if (value === null || value === undefined) return undefined;
+        const normalized = String(value).trim();
+        return normalized ? normalized : undefined;
+      },
+    },
+    role: {
+      type: String,
+      enum: ['Victim', 'Rescue', 'Admin', 'VICTIM', 'RESCUE', 'ADMIN'],
+      default: 'Victim',
+    },
+    status: {
+      type: String,
+      enum: ['Active', 'Blocked', 'ACTIVE', 'INACTIVE', 'BANNED'],
+      default: 'Active',
+    },
+    profile: { type: profileSchema, default: () => ({}) },
+    auth: { type: authSchema, default: () => ({}) },
+  },
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
+);
+
+userSchema.index({ 'auth.email': 1 }, { sparse: true, unique: true });
+
+export default mongoose.model('User', userSchema, 'users');

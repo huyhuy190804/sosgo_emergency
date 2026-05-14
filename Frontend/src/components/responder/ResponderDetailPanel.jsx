@@ -1,0 +1,129 @@
+import { Ambulance, MapPin, CheckCircle2, Ban } from "lucide-react";
+
+export default function ResponderDetailPanel({
+  selectedRequest,
+  teamStats,
+  nearestTeams,
+  toastAlerts,
+  onDismissToast,
+  onSelectToastRequest,
+  onAcceptMission,
+  acceptLoading,
+  primaryActionLabel,
+  onPrimaryAction,
+  primaryActionDisabled,
+}) {
+  const alerts = Array.isArray(toastAlerts) ? toastAlerts : [];
+  const actionLabel =
+    acceptLoading ? "ĐANG XỬ LÝ..." : (primaryActionLabel || "NHẬN NHIỆM VỤ");
+
+  function PrimaryIcon() {
+    if (/ĐÃ HOÀN THÀNH|ĐÃ ĐÓNG CASE/i.test(actionLabel))
+      return <CheckCircle2 size={18} aria-hidden />;
+    if (/HỦY/i.test(actionLabel)) return <Ban size={18} aria-hidden />;
+    if (/XEM KẾT QUẢ/i.test(actionLabel))
+      return <CheckCircle2 size={18} className="text-emerald-200" aria-hidden />;
+    return <Ambulance size={18} aria-hidden />;
+  }
+
+  const detailContent = !selectedRequest ? (
+    <aside className="responder-detail-col responder-detail-empty-wrap">
+      <div className="responder-team-state">
+        <span>TRẠNG THÁI ĐỘI</span>
+        <strong>{teamStats.active > 0 ? "SẴN SÀNG" : "THIẾU ĐỘI"}</strong>
+      </div>
+      <div className="responder-detail-empty">
+        Chưa có yêu cầu được chọn. Vui lòng chờ dữ liệu SOS từ hệ thống.
+      </div>
+    </aside>
+  ) : (
+    <aside className="responder-detail-col">
+      <div className="responder-team-state">
+        <span>TRẠNG THÁI ĐỘI</span>
+        <strong>{teamStats.active > 0 ? "SẴN SÀNG" : "THIẾU ĐỘI"}</strong>
+      </div>
+
+      <div className="responder-map-box">
+        <div className="map-overlay-grid" aria-hidden="true" />
+        <p className="map-label">TỌA ĐỘ MỤC TIÊU</p>
+        <p className="map-coords">{selectedRequest.coords}</p>
+      </div>
+
+      <div className="responder-detail-body">
+        <p className="responder-receive-time">Yêu cầu lúc: {selectedRequest.receivedAt}</p>
+        <h2>{selectedRequest.title}</h2>
+        <p className="responder-detail-address">
+          <MapPin size={14} /> {selectedRequest.address}
+        </p>
+
+        <p className="responder-section-title">CHI TIẾT</p>
+        <p className="responder-detail-text">{selectedRequest.description}</p>
+
+        <p className="responder-nearest-line">
+          Đội gần nhất (10km): {nearestTeams.length > 0 ? nearestTeams[0].full_name : "Chưa có dữ liệu"}
+        </p>
+
+        <div className="responder-kpi-grid">
+          <div>
+            <p>KHOẢNG CÁCH</p>
+            <strong>{selectedRequest.distanceKm != null ? `${selectedRequest.distanceKm} km` : "—"}</strong>
+          </div>
+          <div>
+            <p>THỜI GIAN TỚI</p>
+            <strong>{selectedRequest.etaMinutes != null ? `~${selectedRequest.etaMinutes} phút` : "—"}</strong>
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        className={`responder-main-action${/^ĐÃ HOÀN THÀNH|ĐÃ ĐÓNG CASE|NHIỆM VỤ ĐÃ HỦY/.test(actionLabel) ? " is-terminal-state" : ""}`}
+        disabled={acceptLoading || primaryActionDisabled || (!onPrimaryAction && !onAcceptMission)}
+        onClick={() => (onPrimaryAction ? onPrimaryAction(selectedRequest) : onAcceptMission?.(selectedRequest))}
+      >
+        <PrimaryIcon />{" "}
+        {actionLabel}
+      </button>
+    </aside>
+  );
+
+  return (
+    <>
+      {detailContent}
+      {alerts.length ? (
+        <div className="responder-toast-alerts">
+          {alerts.map((alert) => (
+            <article key={alert.id} className={`toast-alert toast-${alert.level}`}>
+              <div className="toast-head">
+                <span className="toast-tag">{alert.level === "high" ? "CAO" : alert.level === "critical" ? "CỰC CAO" : alert.level === "medium" ? "TRUNG BÌNH" : alert.level === "low" ? "THẤP" : "THÔNG BÁO"}</span>
+                <span className="toast-time">{alert.ago}</span>
+              </div>
+              <h4>{alert.title}</h4>
+              <p>{alert.description}</p>
+              <div className="toast-actions">
+                <button
+                  type="button"
+                  className="toast-action-btn"
+                  onClick={() => {
+                    onSelectToastRequest?.(alert.requestId);
+                    onDismissToast?.(alert.id);
+                  }}
+                >
+                  {alert.actionLabel}
+                </button>
+                <button
+                  type="button"
+                  className="toast-close-btn"
+                  onClick={() => onDismissToast?.(alert.id)}
+                  aria-label="Đóng"
+                >
+                  ×
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+}

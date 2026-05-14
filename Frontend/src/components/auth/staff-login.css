@@ -1,0 +1,250 @@
+.staff-auth-page {
+  --staff-font-body: "Geist Variable", "Segoe UI", sans-serif;
+  --staff-font-display: "Geist Variable", "Segoe UI", sans-serif;
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: var(--staff-font-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  background: linear-gradient(130deg, #f4f6fb 0%, #f8f7fb 52%, #fbf5f8 100%);
+}
+
+.staff-auth-top-pattern {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 108px;
+  background:
+    linear-gradient(180deg, #d9edfd 0%, #e7f3fe 100%),
+    repeating-linear-gradient(-45deg, rgba(39, 93, 173, 0.18) 0 2px, transparent 2px 6px);
+}
+
+.staff-auth-shell {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 560px);
+  display: grid;
+  justify-items: center;
+}
+
+.staff-auth-card {
+  width: min(100%, 430px);
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e8edf5;
+  box-shadow: 0 12px 30px rgba(43, 66, 103, 0.12);
+  padding: 24px 24px 20px;
+}
+
+.staff-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.staff-brand-logo {
+  width: min(100%, 240px);
+  height: auto;
+  display: block;
+}
+
+.staff-auth-title {
+  margin: 10px 0 0;
+  text-align: center;
+  color: #222531;
+  font-family: var(--staff-font-display);
+  font-size: clamp(30px, 2.8vw, 38px);
+  font-weight: 760;
+  line-height: 1.18;
+  letter-spacing: -0.018em;
+}
+
+.staff-auth-subtitle {
+  margin: 8px auto 18px;
+  max-width: 340px;
+  text-align: center;
+  color: #5b6272;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.staff-auth-form {
+  display: grid;
+}
+
+.staff-auth-label {
+  display: block;
+  margin: 0 0 7px;
+  color: #434b59;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.staff-auth-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid #eceef3;
+  border-radius: 10px;
+  background: #f7f7fa;
+  min-height: 50px;
+  padding: 0 11px;
+  margin-bottom: 14px;
+}
+
+.staff-auth-field svg {
+  color: #9a97a6;
+  flex-shrink: 0;
+}
+
+.staff-auth-field input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 15px;
+  color: #2f3441;
+  line-height: 1.35;
+  outline: none;
+}
+
+.staff-auth-field input::placeholder {
+  color: #9ca4b4;
+}
+
+.staff-toggle-password {
+  border: 0;
+  background: transparent;
+  color: #8f8b99;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.staff-auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.staff-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #505868;
+  font-size: 13px;
+}
+
+.staff-checkbox input {
+  width: 16px;
+  height: 16px;
+}
+
+.staff-forgot-link {
+  border: 0;
+  background: transparent;
+  color: #294cab;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 0;
+}
+
+.staff-auth-submit {
+  width: 100%;
+  border: 0;
+  min-height: 54px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #284bb4, #2948af);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.005em;
+  box-shadow: 0 10px 16px rgba(35, 74, 170, 0.22);
+}
+
+.staff-auth-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.staff-submit-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.staff-auth-error {
+  margin: 0 0 12px;
+  color: #b42318;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.staff-auth-divider {
+  height: 1px;
+  background: #edf1f5;
+  margin: 20px 0 12px;
+}
+
+.staff-auth-footer {
+  text-align: center;
+  color: #646879;
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.staff-auth-footer button {
+  border: 0;
+  background: transparent;
+  color: #244ba7;
+  font-size: inherit;
+  font-weight: 700;
+  padding: 0;
+}
+
+.staff-auth-sos-link {
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.staff-auth-sos-link a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.staff-auth-sos-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 520px) {
+  .staff-auth-card {
+    width: min(100%, 390px);
+    padding: 18px 14px 16px;
+  }
+
+  .staff-brand h1 {
+    font-size: clamp(24px, 7.5vw, 30px);
+  }
+
+  .staff-auth-title {
+    font-size: clamp(30px, 10vw, 38px);
+  }
+
+  .staff-auth-submit {
+    font-size: 19px;
+  }
+
+  .staff-auth-row {
+    gap: 8px;
+  }
+}
