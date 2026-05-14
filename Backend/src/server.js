@@ -49,13 +49,9 @@ function getAllowedOrigins() {
 const allowedOrigins = getAllowedOrigins();
 console.log(`📋 CORS allowed origins (${allowedOrigins.length}):`, allowedOrigins.join(", "));
 
-function isAllowedCorsOrigin(origin) {
-  if (!origin) return true;
-  return allowedOrigins.includes(normalizeOrigin(origin));
-}
-
-function corsOriginCallback(origin, callback) {
-  if (isAllowedCorsOrigin(origin)) {
+/** Giống mẫu cors(origin, callback): không origin (curl / same-origin) hoặc nằm trong whitelist. */
+function corsOrigin(origin, callback) {
+  if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
     callback(null, true);
   } else {
     callback(new Error("Not allowed by CORS"));
@@ -66,7 +62,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: corsOriginCallback,
+    origin: corsOrigin,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   },
@@ -85,7 +81,7 @@ function normalizeSocketRole(role) {
 
 app.use(
   cors({
-    origin: corsOriginCallback,
+    origin: corsOrigin,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
