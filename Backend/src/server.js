@@ -18,29 +18,57 @@ import { firebaseAdminAuth } from "./config/firebaseAdmin.js";
 
 dotenv.config();
 
-/** Origins allowed for REST + Socket.IO (must match browser address bar, including LAN IP). */
-function getFrontendCorsOrigins() {
+/**
+ * Chuẩn hóa origin để so khớp với giá trị trong FRONTEND_ORIGINS (bỏ path, bỏ "/" thừa).
+ * Origin từ trình duyệt luôn dạng scheme://host[:port], không có path.
+ */
+function normalizeOrigin(value) {
+  const s = String(value || "").trim();
+  if (!s) return "";
+  try {
+    return new URL(s).origin;
+  } catch {
+    return s.replace(/\/+$/, "");
+  }
+}
+
+/** Danh sách origin được phép (CORS + Socket.IO) — đọc từ FRONTEND_ORIGINS + FRONTEND_URL. */
+function getAllowedOrigins() {
   const defaults =
     "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173";
   const raw = String(process.env.FRONTEND_ORIGINS || defaults);
   const list = raw
     .split(",")
-    .map((x) => x.trim())
+    .map((x) => normalizeOrigin(x))
     .filter(Boolean);
-  const single = process.env.FRONTEND_URL?.trim();
+  const single = normalizeOrigin(process.env.FRONTEND_URL);
   if (single && !list.includes(single)) list.push(single);
-  return list;
+  return [...new Set(list)];
 }
 
-const frontendCorsOrigins = getFrontendCorsOrigins();
+const allowedOrigins = getAllowedOrigins();
+console.log(`📋 CORS allowed origins (${allowedOrigins.length}):`, allowedOrigins.join(", "));
+
+function isAllowedCorsOrigin(origin) {
+  if (!origin) return true;
+  return allowedOrigins.includes(normalizeOrigin(origin));
+}
+
+function corsOriginCallback(origin, callback) {
+  if (isAllowedCorsOrigin(origin)) {
+    callback(null, true);
+  } else {
+    callback(new Error("Not allowed by CORS"));
+  }
+}
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: frontendCorsOrigins,
+    origin: corsOriginCallback,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   },
   transports: ["websocket", "polling"],
 });
@@ -57,13 +85,10 @@ function normalizeSocketRole(role) {
 
 app.use(
   cors({
-    origin: (origin, cb) => {
-      if (!origin || frontendCorsOrigins.includes(origin)) return cb(null, true);
-      return cb(null, false);
-    },
+    origin: corsOriginCallback,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
   })
 );
 app.use(express.json());
