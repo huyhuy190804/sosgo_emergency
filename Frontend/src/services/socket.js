@@ -1,5 +1,6 @@
 import io from "socket.io-client";
 import { auth } from "@/lib/firebase";
+import { getApiBaseUrl } from "@/lib/apiBaseUrl";
 
 let socketInstance = null;
 let socketAuthMeta = null;
@@ -17,8 +18,7 @@ function normalizeRole(role) {
 function resolveSocketUrl() {
   const explicitSocketUrl = import.meta.env.VITE_SOCKET_URL;
   if (explicitSocketUrl) return explicitSocketUrl;
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
-  return apiUrl.replace(/\/api\/?$/, "");
+  return getApiBaseUrl().replace(/\/api\/?$/i, "");
 }
 
 function buildSocketAuthMeta(token, userId, userRole) {

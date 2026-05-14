@@ -21,6 +21,7 @@ import {
   saveVictimProfile,
   clearVictimProfile,
 } from '@/services/auth/session';
+import { getApiBaseUrl } from "@/lib/apiBaseUrl";
 
 function loadStaffSession() {
   try {
@@ -255,9 +256,7 @@ export default function SosPage() {
     const unsub = subscribeAuthState(async ({ user: fbUser, idToken }) => {
       if (!fbUser || !idToken) return;
       try {
-        const raw = (import.meta.env.VITE_API_URL || "http://localhost:3001/api").replace(/\/$/, "");
-        const apiBase = /\/api$/i.test(raw) ? raw : `${raw}/api`;
-        const res = await fetch(`${apiBase}/auth/firebase`, {
+        const res = await fetch(`${getApiBaseUrl()}/auth/firebase`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ idToken }),

@@ -1,6 +1,7 @@
 import { auth } from '@/lib/firebase';
 import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
+import { getApiBaseUrl } from "@/lib/apiBaseUrl";
 
 // ─── Firebase token helper (victim) ─────────────────────────────────────────
 function waitForFirebaseUser() {
@@ -21,9 +22,9 @@ async function getFirebaseToken() {
   return null;
 }
 
-// ─── Axios instance (phải dùng VITE_API_URL — trùng với src/services/api/index.js) ─
+// ─── Axios instance (baseURL qua getApiBaseUrl — trùng với src/services/api/index.js) ─
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
+  baseURL: getApiBaseUrl(),
 });
 
 // Interceptor: gắn staff JWT mặc định, trừ khi skipStaffJwt = true
