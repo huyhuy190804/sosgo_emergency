@@ -381,7 +381,7 @@ export default function ResponderRequestList({
                 </div>
 
                 {item.description && (
-                  <p className="text-xs font-bold text-gray-500">Mã tình nguyện nhân: <span className="text-gray-800">{item.description}</span></p>
+                  <p className="text-xs font-bold text-gray-500">Mô tả nguyên nhân: <span className="text-gray-800">{item.description}</span></p>
                 )}
 
                 <div className="flex items-start gap-2">
