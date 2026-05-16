@@ -49,7 +49,9 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const [showRelDropdown, setShowRelDropdown] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const location = useLocation();
   const [editForm, setEditForm] = useState({
@@ -217,7 +219,7 @@ export default function ProfilePage() {
 
     {/* HEADER */}
     <header className="bg-white border-b border-gray-100 w-full sticky top-0 z-30">
-      <Header />
+      <Header clearVictimProfile={clearVictimProfile} logoutVictimFirebase={logoutVictimFirebase} />
     </header>
 
     <div className="flex flex-1 overflow-hidden min-h-0">
@@ -247,7 +249,10 @@ export default function ProfilePage() {
           </nav>
         </div>
         <div className="px-3 pb-5 flex flex-col gap-0.5">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 cursor-pointer hover:text-gray-600 hover:bg-gray-50 transition">
+          <div 
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 cursor-pointer hover:text-gray-600 hover:bg-gray-50 transition"
+            onClick={() => setShowSupportModal(true)}
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/>
             </svg>
@@ -271,58 +276,47 @@ export default function ProfilePage() {
 
       {/* MAIN */}
       <div className="flex-1 overflow-y-auto" style={{ background: "rgb(244,251,244)" }}>
-        <div className="max-w-5xl mx-auto px-8 py-7">
+        <div className="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-7">
 
-          <h1 className="text-lg font-bold text-gray-700 mb-6">Hồ sơ cá nhân</h1>
+          <h1 className="text-lg font-bold text-gray-700 mb-6 px-1 md:px-0">Hồ sơ cá nhân</h1>
 
           {/* Avatar card */}
-          <div className="bg-white rounded-2xl px-6 py-5 flex items-center gap-5 shadow-sm mb-6">
+          <div className="bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-gray-50 mb-6 md:px-6 md:py-5 md:gap-5">
             <div className="relative flex-shrink-0">
-              <img
-                src={getUserAvatarSrc({ profile: { avatar_url: avatar } })}
-                className="w-20 h-20 rounded-full object-cover ring-2 ring-emerald-100"
-                alt=""
-              />
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden ring-2 ring-emerald-50 md:ring-2 md:ring-emerald-100">
+                <img
+                  src={getUserAvatarSrc({ profile: { avatar_url: avatar } })}
+                  className="w-full h-full object-cover"
+                  alt=""
+                />
+              </div>
+              <div className="absolute bottom-0 right-0 w-6 h-6 bg-[#10B981] rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
               <input type="file" accept="image/*" className="hidden" ref={fileInputRef}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
                     const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      handleSetAvatar(ev.target.result); 
-                    };
+                    reader.onload = (ev) => handleSetAvatar(ev.target.result); 
                     reader.readAsDataURL(file);
                     e.target.value = "";
                   }
                 }}/>
-              {avatar ? (
-                <button className="absolute bottom-0 right-0 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center shadow transition"
-                  onClick={() => setAvatar(null)}>
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                  </svg>
-                </button>
-              ) : (
-                <button className="absolute bottom-0 right-0 w-6 h-6 bg-emerald-600 hover:bg-emerald-700 rounded-full flex items-center justify-center shadow transition"
-                  onClick={() => fileInputRef.current?.click()}>
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-                    <circle cx="12" cy="13" r="4"/>
-                  </svg>
-                </button>
-              )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold text-gray-900 leading-tight">{user?.full_name || "—"}</h2>
-              <div className="flex items-center gap-1.5 mt-1.5 text-gray-500 text-sm">
-                <svg className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <h2 className="text-xl font-bold text-gray-900 truncate md:text-2xl leading-tight">{user?.full_name || "—"}</h2>
+              <div className="flex items-center gap-1.5 mt-1 text-gray-500 text-sm">
+                <svg className="w-4 h-4 text-[#10B981] md:text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.25 12 19.79 19.79 0 011.15 3.42 2 2 0 013.12 1.25h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.5a16 16 0 006.29 6.29l1.42-1.26a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121.5 16z"/>
                 </svg>
-                {user?.phone || "—"}
+                <span className="font-medium">{user?.phone || "—"}</span>
               </div>
             </div>
             <button onClick={handleOpenEdit}
-              className="flex-shrink-0 border border-emerald-400 text-emerald-600 bg-[#ECFDF5] hover:bg-emerald-100 text-sm font-semibold px-4 py-1 rounded-sm transition flex items-center gap-1.5">
+              className="flex-shrink-0 border border-[#10B981] text-[#10B981] md:border-emerald-400 md:text-emerald-600 md:bg-[#ECFDF5] md:hover:bg-emerald-100 font-bold text-xs md:text-sm px-3 py-2 md:px-4 md:py-1 rounded-lg md:rounded-sm transition-all flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -331,178 +325,183 @@ export default function ProfilePage() {
             </button>
           </div>
 
-          {/* Grid 5 cột cho phần còn lại */}
-          <div className="grid grid-cols-5 gap-6">
+          {/* Responsive Layout Grid - Flattened for better order control */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
 
-            {/* LEFT (3/5) */}
-            <div className="col-span-3 flex flex-col gap-5">
-
-              {/* Thông tin cá nhân */}
-              <div className="px-1">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="bg-green-100 text-[#047857] rounded-lg p-1.5">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-600">Thông tin cá nhân</h3>
+            {/* Thông tin cá nhân - Desktop Left Column Top */}
+            <section className="md:col-span-3 order-1 px-1 md:px-0">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-[#ECFDF5] text-[#10B981] md:bg-green-100 md:text-[#047857] rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: "HỌ TÊN", value: user?.full_name },
-                    { label: "SỐ ĐIỆN THOẠI", value: user?.phone },
-                    {
-                      label: "NGÀY SINH",
-                      value: user?.profile?.date_of_birth
-                        ? new Date(user.profile.date_of_birth).toLocaleDateString("vi-VN") : "—"
-                    },
-                    { label: "GIỚI TÍNH", value: user?.profile?.gender || "—" },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                      <p className="text-[9px] font-bold text-gray-400 tracking-widest mb-1">{label}</p>
-                      <p className="text-sm font-semibold text-gray-800">{value || "—"}</p>
-                    </div>
-                  ))}
-                  <div className="col-span-2 bg-white rounded-xl px-4 py-3 shadow-sm">
-                    <p className="text-[9px] font-bold text-gray-400 tracking-widest mb-1">ĐỊA CHỈ</p>
-                    <p className="text-sm font-semibold text-gray-800">{user?.profile?.address || "—"}</p>
+                <h3 className="text-base font-bold text-gray-700 md:text-sm md:font-semibold md:text-gray-600">Thông tin cá nhân</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "HỌ TÊN", value: user?.full_name },
+                  { label: "SỐ ĐIỆN THOẠI", value: user?.phone },
+                  {
+                    label: "NGÀY SINH",
+                    value: user?.profile?.date_of_birth
+                      ? new Date(user.profile.date_of_birth).toLocaleDateString("vi-VN") : "—"
+                  },
+                  { label: "GIỚI TÍNH", value: user?.profile?.gender || "—" },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 md:px-4 md:py-3 md:shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                    <p className="text-[10px] md:text-[9px] font-bold text-gray-400 tracking-wider mb-1">{label}</p>
+                    <p className="text-sm font-bold md:font-semibold text-gray-800">{value || "—"}</p>
                   </div>
+                ))}
+                <div className="col-span-2 bg-white rounded-xl p-4 shadow-sm border border-gray-50 md:px-4 md:py-3 md:shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                  <p className="text-[10px] md:text-[9px] font-bold text-gray-400 tracking-wider mb-1">ĐỊA CHỈ</p>
+                  <p className="text-sm font-bold md:font-semibold text-gray-800">{user?.profile?.address || "—"}</p>
                 </div>
               </div>
+            </section>
 
-              {/* Thông tin y tế */}
-              <div className="rounded-2xl border border-red-100 px-6 py-5 shadow-sm" style={{ background: "#fff5f5" }}>
-                <div className="flex items-center gap-2 mb-5">
-                  <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center">
-                    <img src={medicalIcon} alt="medical" className="w-4 h-4"/>
-                  </div>
-                  <h3 className="text-sm font-semibold text-red-500">Thông tin y tế</h3>
+            {/* Liên hệ khẩn cấp - Desktop Right Column Top */}
+            <section className="md:col-span-2 order-2 bg-[#FEF6F6] -mx-4 px-4 py-6 md:mx-0 md:bg-transparent md:p-0">
+              <div className="flex items-center gap-2 mb-4 px-1 md:px-0">
+                <div className="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center md:bg-transparent md:w-auto md:h-auto">
+                  <img src={contactList} alt="contact" className="w-5 h-5 md:w-4 md:h-4"/>
                 </div>
-                <div className="flex gap-3 mb-5">
-                  <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-red-50 flex-1">
-                    <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
+                <h3 className="text-base font-bold text-red-600 md:text-sm md:font-semibold md:text-gray-600">Liên hệ khẩn cấp</h3>
+              </div>
+              <div className="space-y-3">
+                {user?.profile?.emergency_contacts?.map((contact, i) => (
+                  <div key={i}
+                    onClick={() => setSelectedContact({ ...contact, index: i })}
+                    className="flex items-center justify-between p-4 md:p-3 rounded-2xl md:rounded-xl bg-white shadow-sm border border-transparent hover:border-red-100 md:hover:border-emerald-100 transition cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 md:w-10 md:h-10 rounded-full bg-red-100 md:bg-transparent flex items-center justify-center text-red-600 font-bold">
+                        <img src={contactIcon} alt="contact" className="w-full h-full rounded-full object-cover"/>
+                      </div>
+                      <div>
+                        <p className="text-base md:text-sm font-bold md:font-semibold text-gray-800 leading-tight">{contact.name}</p>
+                        <p className="text-sm md:text-xs text-[#10B981] md:text-emerald-600 font-bold md:font-medium mt-0.5">{contact.relation}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => { 
+                        e.stopPropagation();
+                        window.location.href = `tel:${contact.phone}`;
+                      }}
+                      className="w-10 h-10 md:w-9 md:h-9 bg-red-600 md:bg-transparent rounded-lg flex items-center justify-center md:shadow-none shadow-md shadow-red-200 active:scale-95 transition">
+                      <img src={call} alt="call" className="w-5 h-5 md:w-9 md:h-9"/>
+                    </button>
+                  </div>
+                ))}
+
+                <button onClick={() => setOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 py-4 md:py-3 text-sm font-bold md:font-medium text-gray-400 hover:text-emerald-600 border-2 md:border border-dashed border-gray-200 md:border-gray-300 hover:border-emerald-300 rounded-2xl md:rounded-xl bg-white/60 transition">
+                  <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Thêm liên hệ mới
+                </button>
+              </div>
+            </section>
+
+            {/* Thông tin y tế - Desktop Left Column Bottom */}
+            <section className="md:col-span-3 order-4 md:order-none pb-10 md:pb-0">
+              <div className="rounded-2xl border border-red-100 p-6 shadow-sm md:px-6 md:py-5" style={{ background: "#fff5f5" }}>
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center md:w-7 md:h-7">
+                    <img src={medicalIcon} alt="medical" className="w-5 h-5 md:w-4 md:h-4"/>
+                  </div>
+                  <h3 className="text-base font-bold text-red-600 md:text-sm md:font-semibold md:text-red-500">Thông tin y tế</h3>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3 mb-6 md:flex md:gap-3 md:mb-5">
+                  <div className="bg-white rounded-2xl p-3 shadow-sm border border-red-50 flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:gap-3 md:px-4 md:py-3 md:flex-1 md:rounded-xl md:border-red-50">
+                    <div className="w-10 h-10 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-2 md:mb-0 md:w-9 md:h-9 md:rounded-xl md:flex-shrink-0">
+                      <svg className="w-5 h-5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                       </svg>
                     </div>
-                    <div>
-                      <p className="text-[8px] font-bold text-gray-400 tracking-widest">NHÓM MÁU</p>
-                      <p className="text-lg font-bold text-red-600 leading-tight">{user?.profile?.blood_type || "—"}</p>
+                    <div className="md:block">
+                      <p className="text-[9px] md:text-[8px] font-bold text-gray-400 mb-1 md:mb-0 md:tracking-widest">NHÓM MÁU</p>
+                      <p className="text-lg md:text-lg font-black md:font-bold text-red-600 leading-tight">{user?.profile?.blood_type || "—"}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-red-50 flex-1">
-                    <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  
+                  <div className="bg-white rounded-2xl p-3 shadow-sm border border-red-50 flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:gap-3 md:px-4 md:py-3 md:flex-1 md:rounded-xl md:border-red-50">
+                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-2 md:mb-0 md:w-9 md:h-9 md:rounded-xl md:flex-shrink-0">
+                      <svg className="w-5 h-5 md:w-4 md:h-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path d="M8 3H5a2 2 0 00-2 2v14a2 2 0 002 2h3M16 3h3a2 2 0 012 2v14a2 2 0 01-2 2h-3M12 8v8M9 11l3-3 3 3"/>
                       </svg>
                     </div>
-                    <div>
-                      <p className="text-[8px] font-bold text-gray-400 tracking-widest">CHIỀU CAO</p>
-                      <p className="text-lg font-bold text-gray-800 leading-tight">{user?.profile?.height ? `${user.profile.height} cm` : "—"}</p>
+                    <div className="md:block">
+                      <p className="text-[9px] md:text-[8px] font-bold text-gray-400 mb-1 md:mb-0 md:tracking-widest">CHIỀU CAO</p>
+                      <p className="text-lg md:text-lg font-black md:font-bold text-gray-800 leading-tight">{user?.profile?.height ? `${user.profile.height} cm` : "—"}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-red-50 flex-1">
-                    <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+
+                  <div className="bg-white rounded-2xl p-3 shadow-sm border border-red-50 flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:gap-3 md:px-4 md:py-3 md:flex-1 md:rounded-xl md:border-red-50">
+                    <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-2 md:mb-0 md:w-9 md:h-9 md:rounded-xl md:flex-shrink-0">
+                      <svg className="w-5 h-5 md:w-4 md:h-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                       </svg>
                     </div>
-                    <div>
-                      <p className="text-[8px] font-bold text-gray-400 tracking-widest">CÂN NẶNG</p>
-                      <p className="text-lg font-bold text-gray-800 leading-tight">{user?.profile?.weight ? `${user.profile.weight} kg` : "—"}</p>
+                    <div className="md:block">
+                      <p className="text-[9px] md:text-[8px] font-bold text-gray-400 mb-1 md:mb-0 md:tracking-widest">CÂN NẶNG</p>
+                      <p className="text-lg md:text-lg font-black md:font-bold text-gray-800 leading-tight">{user?.profile?.weight ? `${user.profile.weight} kg` : "—"}</p>
                     </div>
                   </div>
                 </div>
-                {(() => {
-                  const list = user?.profile?.allergies
-                    ? user.profile.allergies.split(",").map(s => s.trim()).filter(Boolean)
-                    : [];
-                  return list.length > 0 ? (
-                    <div className="mb-4">
-                      <p className="text-[9px] font-bold text-gray-400 tracking-widest mb-2">DỊ ỨNG</p>
-                      <div className="flex flex-wrap gap-2">
-                        {list.map((a) => (
-                          <span key={a} className="text-xs px-3 py-1 bg-white border border-gray-200 rounded-full text-gray-600 font-medium">{a}</span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null;
-                })()}
-                {(user?.profile?.medical_history || []).length > 0 && (
-                  <div>
-                    <p className="text-[9px] font-bold text-red-400 tracking-widest mb-2">BỆNH NỀN QUAN TRỌNG</p>
-                    <div className="flex flex-wrap gap-2">
-                      {(user?.profile?.medical_history || []).map((b) => (
-                        <span key={b} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 bg-red-600 text-white rounded-full font-semibold">
-                          <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
-                          </svg>
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
 
-            </div>
-
-            {/* RIGHT*/}
-            <div className="col-span-2 flex flex-col gap-5">
-
-              {/* Liên hệ khẩn cấp */}
-              <div className="px-1">
-                <div className="flex items-center gap-2 mb-4">
-                  <img src={contactList} alt="contact" className="w-4 h-4"/>
-                  <h3 className="text-sm font-semibold text-gray-600">Liên hệ khẩn cấp</h3>
-                </div>
-                <div className="flex flex-col gap-3">
-                  {user?.profile?.emergency_contacts?.map((contact, i) => (
-                    <div key={i}
-                      onClick={() => setSelectedContact({ ...contact, index: i })}
-                      className="flex items-center justify-between p-3 rounded-xl bg-white shadow-sm hover:shadow-md hover:border-emerald-100 border border-transparent transition cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <img src={contactIcon} alt="contact" className="w-10 h-10 rounded-full object-cover flex-shrink-0"/>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-800 leading-tight">{contact.name}</p>
-                          <p className="text-xs text-emerald-600 font-medium mt-0.5">{contact.relation}</p>
+                <div className="space-y-6 px-1 md:px-0 md:space-y-4">
+                  {(() => {
+                    const list = user?.profile?.allergies
+                      ? user.profile.allergies.split(",").map(s => s.trim()).filter(Boolean)
+                      : [];
+                    return (
+                      <div>
+                        <p className="text-[10px] md:text-[9px] font-bold text-gray-400 tracking-wider mb-2 uppercase">Dị ứng</p>
+                        <div className="flex flex-wrap gap-2">
+                          {list.length > 0 ? list.map((a) => (
+                            <span key={a} className="text-xs font-bold md:font-medium px-4 py-2 md:px-3 md:py-1 bg-white border border-gray-200 rounded-lg md:rounded-full text-gray-700 md:text-gray-600">{a}</span>
+                          )) : <span className="text-sm text-gray-400 italic">Không có dữ liệu</span>}
                         </div>
                       </div>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); }}
-                        className="w-9 h-9">
-                        <img src={call} alt="call" className="w-9 h-9"/>
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })()}
 
-                  <button onClick={() => setOpen(true)}
-                    className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-400 hover:text-emerald-600 border border-dashed border-gray-300 hover:border-emerald-300 rounded-xl bg-white/60 transition">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
-                    </svg>
-                    Thêm liên hệ mới
-                  </button>
+                  <div>
+                    <p className="text-[10px] md:text-[9px] font-bold text-red-400 tracking-wider mb-2 uppercase">Bệnh nền quan trọng</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(user?.profile?.medical_history || []).length > 0 ? (user?.profile?.medical_history || []).map((b) => (
+                        <span key={b} className="inline-flex items-center gap-1.5 text-xs font-black md:font-semibold px-4 py-2 md:px-3 md:py-1.5 bg-red-600 text-white rounded-lg md:rounded-full shadow-sm md:shadow-none">
+                          <svg className="w-3.5 h-3.5 md:w-3 md:h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                          </svg>
+                          {b.toUpperCase()}
+                        </span>
+                      )) : <span className="text-sm text-gray-400 italic">Không có dữ liệu</span>}
+                    </div>
+                  </div>
                 </div>
               </div>
+            </section>
 
-              {/* Security card */}
-              <div className="rounded-2xl px-5 py-5" style={{ background: "#162118" }}>
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(255,255,255,0.08)" }}>
-                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2z"/>
+            {/* Security notice card - Desktop Right Column Bottom */}
+            <section className="md:col-span-2 order-3 md:order-none px-4 md:px-0">
+              <div className="rounded-2xl p-5 bg-[#121914] md:bg-[#162118] text-white">
+                <div className="w-10 h-10 md:w-8 md:h-8 rounded-xl bg-white/5 md:bg-white/10 border border-white/10 flex items-center justify-center mb-4 md:mb-3">
+                  <svg className="w-5 h-5 md:w-4 md:h-4 text-[#10B981] md:text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                   </svg>
                 </div>
-                <p className="text-sm text-gray-300 leading-relaxed">
+                <p className="text-sm text-gray-300 leading-relaxed font-medium md:font-normal">
                   Dữ liệu y tế của bạn được mã hoá đầu cuối và chỉ chia sẻ với đội cứu hộ trong tình huống khẩn cấp.
                 </p>
-                <button className="mt-3 text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition">
+                <button className="mt-3 text-sm md:text-xs text-[#10B981] md:text-emerald-400 font-bold md:font-semibold hover:underline md:hover:text-emerald-300 transition">
                   Tìm hiểu thêm →
                 </button>
               </div>
-
-            </div>
+            </section>
           </div>
         </div>
       </div>
@@ -615,8 +614,8 @@ export default function ProfilePage() {
 
     {/* Modal thêm liên hệ */}
     {open && (
-      <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-        <div className="w-[360px] bg-white rounded-2xl shadow-xl p-5">
+      <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+        <div className="w-full max-w-[360px] bg-white rounded-2xl shadow-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <span className="px-4 py-1.5 bg-[#B7141B] text-white rounded-full text-sm font-semibold">
               Thêm liên hệ khẩn cấp
@@ -642,17 +641,40 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700">Mối quan hệ</label>
-              <select className="w-full mt-1 p-3 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-red-200 text-sm"
-                value={contactForm.relation}
-                onChange={(e) => setContactForm({ ...contactForm, relation: e.target.value })}>
-                <option value="">Chọn mối quan hệ</option>
-                <option value="Bố">Bố</option>
-                <option value="Mẹ">Mẹ</option>
-                <option value="Vợ/Chồng">Vợ/Chồng</option>
-                <option value="Anh/Chị/Em">Anh/Chị/Em</option>
-                <option value="Bạn bè">Bạn bè</option>
-                <option value="Khác">Khác</option>
-              </select>
+              <div className="relative mt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowRelDropdown(!showRelDropdown)}
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-red-200 text-sm transition-all text-left"
+                >
+                  <span className={contactForm.relation ? "text-gray-800 font-medium" : "text-gray-400"}>
+                    {contactForm.relation || "Chọn mối quan hệ"}
+                  </span>
+                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${showRelDropdown ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+
+                {showRelDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-[60] overflow-hidden animate-in fade-in zoom-in duration-200">
+                    {["Bố", "Mẹ", "Vợ/Chồng", "Anh/Chị/Em", "Bạn bè", "Khác"].map((rel) => (
+                      <button
+                        key={rel}
+                        type="button"
+                        onClick={() => {
+                          setContactForm({ ...contactForm, relation: rel });
+                          setShowRelDropdown(false);
+                        }}
+                        className={`w-full px-4 py-3 text-sm text-left hover:bg-gray-50 border-b border-gray-50 last:border-none transition-colors ${
+                          contactForm.relation === rel ? "text-red-600 font-bold bg-red-50/30" : "text-gray-600"
+                        }`}
+                      >
+                        {rel}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex gap-3 mt-6">
@@ -775,6 +797,46 @@ export default function ProfilePage() {
               className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl transition text-sm">
               Hủy
             </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* SUPPORT MODAL (Nạn nhân) */}
+    {showSupportModal && (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[99999] p-4" onClick={() => setShowSupportModal(false)} style={{ zIndex: 999999 }}>
+        <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-4 flex items-center justify-between">
+            <h3 className="text-white font-bold text-lg">Hướng dẫn sử dụng</h3>
+            <button onClick={() => setShowSupportModal(false)} className="text-white/80 hover:text-white transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <h4 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span> 
+                Trang chủ (Gửi SOS)
+              </h4>
+              <p className="text-xs text-gray-600 pl-8 leading-relaxed">Nhấn nút SOS khẩn cấp khi gặp sự cố. Hệ thống sẽ tự động xác định vị trí và phân phối tín hiệu đến đội cứu hộ gần nhất.</p>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">2</span> 
+                Thông tin cá nhân
+              </h4>
+              <p className="text-xs text-gray-600 pl-8 leading-relaxed">Nơi bạn cập nhật hồ sơ y tế (bệnh nền, dị ứng, nhóm máu) và liên hệ khẩn cấp. Dữ liệu này giúp cứu hộ phản ứng hiệu quả hơn.</p>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">3</span> 
+                Lịch sử cứu trợ
+              </h4>
+              <p className="text-xs text-gray-600 pl-8 leading-relaxed">Xem lại danh sách các tình huống khẩn cấp bạn đã tạo, đánh giá và theo dõi trạng thái xử lý.</p>
+            </div>
+          </div>
+          <div className="px-6 pb-6 pt-2">
+            <button onClick={() => setShowSupportModal(false)} className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition">Đã hiểu</button>
           </div>
         </div>
       </div>

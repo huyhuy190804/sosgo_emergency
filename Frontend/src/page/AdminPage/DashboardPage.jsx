@@ -256,20 +256,33 @@ function StatCard({ icon, title, value, subtitle, trend, color = 'blue' }) {
     red: 'text-red-600',
   };
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-[#E8E8EC] bg-white p-5 shadow-sm">
-      <div>
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">
+    <div className="flex items-start justify-between gap-2 rounded-2xl border border-[#E8E8EC] bg-white p-3.5 shadow-sm sm:items-center sm:gap-3 sm:p-5">
+      <div className="min-w-0 flex-1">
+        <p className="mb-0.5 line-clamp-2 text-[10px] font-semibold uppercase leading-tight tracking-wide text-gray-400 sm:mb-1 sm:text-xs">
           {title}
         </p>
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
-        {subtitle && <p className="mt-1 text-xs text-gray-500">{subtitle}</p>}
+        <p className="text-xl font-bold tabular-nums text-gray-900 sm:text-3xl">{value}</p>
+        {subtitle && (
+          <p className="mt-0.5 line-clamp-2 text-[10px] text-gray-500 sm:mt-1 sm:text-xs">{subtitle}</p>
+        )}
         {trend && (
-          <p className={cn('mt-1 flex items-center gap-1 text-xs font-semibold', textMap[color])}>
+          <p
+            className={cn(
+              'mt-0.5 line-clamp-2 text-[10px] font-semibold leading-snug sm:mt-1 sm:text-xs',
+              textMap[color],
+            )}
+          >
             {trend}
           </p>
         )}
       </div>
-      <div className={cn('flex size-12 items-center justify-center rounded-xl', bgMap[color], textMap[color])}>
+      <div
+        className={cn(
+          'flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-12',
+          bgMap[color],
+          textMap[color],
+        )}
+      >
         {icon}
       </div>
     </div>
@@ -311,7 +324,7 @@ function describeDonutSlicePath(cx, cy, rInner, rOuter, a0, a1) {
 
 /** Cột: loại/đội — phần trăm — số lượng (đồng bộ với DistributionRow) */
 const METRIC_TABLE_GRID =
-  'grid grid-cols-[minmax(0,1fr)_minmax(6.5rem,1fr)_minmax(3.25rem,auto)] items-center gap-x-2 sm:gap-x-3';
+  'grid grid-cols-[minmax(0,1fr)_minmax(4.5rem,1fr)_minmax(2.5rem,auto)] items-center gap-x-1.5 sm:grid-cols-[minmax(0,1fr)_minmax(6.5rem,1fr)_minmax(3.25rem,auto)] sm:gap-x-3';
 
 function DistributionMetricHeader({ firstColumnLabel }) {
   return (
@@ -322,7 +335,10 @@ function DistributionMetricHeader({ firstColumnLabel }) {
       )}
     >
       <span className="min-w-0 text-left">{firstColumnLabel}</span>
-      <span className="text-center">Phần trăm %</span>
+      <span className="text-center">
+        <span className="sm:hidden">%</span>
+        <span className="hidden sm:inline">Phần trăm %</span>
+      </span>
       <span className="text-right">Số lượng</span>
     </div>
   );
@@ -353,12 +369,12 @@ function DistributionRow({ label, emoji, count, percent, barColor }) {
 
 function ReportRow({ title, date, size, onDownload }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 hover:bg-gray-100">
-      <div className="flex items-center gap-3">
-        <FileText className="size-5 text-blue-500" />
-        <div>
-          <p className="text-sm font-semibold text-gray-800">{title}</p>
-          <p className="text-xs text-gray-400">
+    <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-3 hover:bg-gray-100 sm:gap-3 sm:px-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <FileText className="size-5 shrink-0 text-blue-500" />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-gray-800">{title}</p>
+          <p className="text-[11px] leading-snug text-gray-400 sm:text-xs">
             Ngày tạo: {date} • {size}
           </p>
         </div>
@@ -720,18 +736,18 @@ export default function DashboardPage() {
         'text-[15px] leading-relaxed sm:text-base sm:leading-normal',
         '[&_.text-xs]:text-sm [&_.text-sm]:text-base [&_.text-base]:text-lg',
         '[&_.text-lg]:text-xl [&_.text-xl]:text-2xl [&_.text-2xl]:text-3xl [&_.text-3xl]:text-4xl [&_.text-4xl]:text-5xl',
-        'w-full space-y-6 px-6 py-8',
+        'w-full space-y-4 px-4 py-6 sm:space-y-6 sm:px-6 sm:py-8 lg:px-8',
       )}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Thống kê & Báo cáo</h1>
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Thống kê & Báo cáo</h1>
           <p className="mt-1 text-sm text-gray-500">
             Phân tích dữ liệu thời gian thực và báo cáo định kỳ.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <div className="relative">
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end lg:w-auto">
+          <div className="relative min-w-0 flex-1 sm:flex-initial">
             <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" />
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <select
@@ -739,9 +755,10 @@ export default function DashboardPage() {
               onChange={(e) => setDateRangePreset(e.target.value)}
               aria-label="Lọc theo khoảng thời gian"
               className={cn(
-                'h-10 min-w-[11.5rem] cursor-pointer appearance-none rounded-lg border border-gray-200',
+                'h-10 w-full min-w-0 cursor-pointer appearance-none rounded-lg border border-gray-200',
                 'bg-white py-2 pl-10 pr-9 text-sm font-medium text-gray-700 shadow-sm',
                 'outline-none transition hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+                'sm:min-w-[11.5rem] sm:w-auto',
               )}
             >
               {DATE_RANGE_PRESETS.map((o) => (
@@ -755,39 +772,46 @@ export default function DashboardPage() {
             type="button"
             onClick={handleExportPdf}
             disabled={loading || pdfExporting}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <Download className="size-4 shrink-0" />
-            {pdfExporting ? 'Đang xuất…' : 'Xuất báo cáo PDF'}
+            {pdfExporting ? (
+              'Đang xuất…'
+            ) : (
+              <>
+                <span className="sm:hidden">Xuất PDF</span>
+                <span className="hidden sm:inline">Xuất báo cáo PDF</span>
+              </>
+            )}
           </button>
         </div>
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          icon={<Activity className="size-6" />}
+          icon={<Activity className="size-5 sm:size-6" />}
           title="Tổng số sự cố"
           value={loading ? '—' : stats.total.toLocaleString('vi-VN')}
           subtitle="Tất cả trạng thái"
           color="blue"
         />
         <StatCard
-          icon={<AlertTriangle className="size-6" />}
+          icon={<AlertTriangle className="size-5 sm:size-6" />}
           title="Sự cố đang hoạt động"
           value={loading ? '—' : stats.active.toLocaleString('vi-VN')}
           trend={loading || dateRangePreset === 'all' ? null : activeIncidentsTrendText}
           color="yellow"
         />
         <StatCard
-          icon={<Clock className="size-6" />}
+          icon={<Clock className="size-5 sm:size-6" />}
           title="T.gian phản hồi TB"
           value={loading ? '—' : `${stats.avgResponse}`}
           subtitle={stats.avgResponse > 0 ? 'phút' : 'Chưa có dữ liệu'}
           color="green"
         />
         <StatCard
-          icon={<CheckCircle2 className="size-6" />}
+          icon={<CheckCircle2 className="size-5 sm:size-6" />}
           title="Tỷ lệ AI phân tích thành công"
           value={loading ? '—' : `${stats.aiAnalysisRate}%`}
           subtitle={loading ? null : aiAnalysisRateSubtitle}
@@ -795,13 +819,13 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Xu hướng sự cố theo thời gian */}
-        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-6 shadow-sm lg:col-span-2">
-          <div className="mb-5">
+        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm sm:p-6 lg:col-span-2">
+          <div className="mb-4 sm:mb-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Xu hướng sự cố theo thời gian</h2>
-              <div className="mt-2 flex items-center gap-5 text-xs text-gray-600">
+              <h2 className="text-base font-bold text-gray-900 sm:text-lg">Xu hướng sự cố theo thời gian</h2>
+              <div className="mt-2 flex flex-col gap-2 text-xs text-gray-600 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2">
                 <label className="flex cursor-pointer items-center gap-2">
                   <input
                     type="radio"
@@ -825,9 +849,10 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-          <div className="flex h-48 items-end justify-between gap-2">
+          <div className="-mx-1 overflow-x-auto px-1 pb-1">
+            <div className="flex h-40 min-w-full items-end justify-between gap-1 sm:h-48 sm:gap-2">
             {activeTrendData.map((d, i) => (
-              <div key={i} className="flex flex-1 flex-col items-center gap-2">
+              <div key={i} className="flex min-w-[1.75rem] flex-1 flex-col items-center gap-1 sm:gap-2">
                 <div className="group relative w-full">
                   <div className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 rounded-md bg-gray-900 px-2 py-1 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
                     {d.count} sự cố
@@ -837,17 +862,20 @@ export default function DashboardPage() {
                     style={{ height: `${Math.max(d.height, 4)}px` }}
                   />
                 </div>
-                <p className="text-xs font-semibold text-gray-400">{d.label}</p>
+                <p className="max-w-full truncate text-[10px] font-semibold text-gray-400 sm:text-xs">
+                  {d.label}
+                </p>
               </div>
             ))}
+            </div>
           </div>
         </div>
 
         {/* Phân loại sự cố */}
-        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-lg font-bold text-gray-900">Phân loại sự cố</h2>
+        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm sm:p-6">
+          <h2 className="mb-4 text-base font-bold text-gray-900 sm:mb-5 sm:text-lg">Phân loại sự cố</h2>
           <div className="mb-4 flex items-center justify-center">
-            <div ref={donutChartRef} className="relative size-40 overflow-visible">
+            <div ref={donutChartRef} className="relative size-32 overflow-visible sm:size-40">
               <svg
                 viewBox="0 0 100 100"
                 className="size-full"
@@ -884,10 +912,12 @@ export default function DashboardPage() {
                 )}
               </svg>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-gray-900 sm:text-3xl">
                   {loading ? '—' : stats.total.toLocaleString('vi-VN')}
                 </p>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">TỔNG SỐ</p>
+                <p className="text-[10px] font-medium uppercase tracking-wide text-gray-400 sm:text-xs">
+                  TỔNG SỐ
+                </p>
               </div>
               {donutHover && (
                 <div
@@ -960,10 +990,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Hiệu suất phản ứng theo Đội cứu trợ  */}
-        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-lg font-bold text-gray-900">
+        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm sm:p-6">
+          <h2 className="mb-4 text-base font-bold text-gray-900 sm:mb-5 sm:text-lg">
             Hiệu suất phản ứng theo Đội cứu trợ
           </h2>
           <div className="space-y-0">
@@ -994,11 +1024,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Tần suất sự cố theo khung giờ */}
-        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-lg font-bold text-gray-900">
+        <div className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm sm:p-6">
+          <h2 className="mb-4 text-base font-bold text-gray-900 sm:mb-5 sm:text-lg">
             Tần suất sự cố theo khung giờ
           </h2>
-          <div className="flex h-48 items-end justify-between gap-2">
+          <div className="-mx-1 overflow-x-auto px-1 pb-1">
+            <div className="flex h-36 min-w-[20rem] items-end justify-between gap-0.5 sm:h-48 sm:min-w-full sm:gap-2">
             {Array.from({ length: 12 }, (_, i) => {
               const hourStart = i * 2;
               const hourEnd = hourStart + 2;
@@ -1021,27 +1052,28 @@ export default function DashboardPage() {
               );
               const height = (count / max) * 100;
               return (
-                <div key={i} className="flex flex-1 flex-col items-center gap-2">
+                <div key={i} className="flex min-w-[1.35rem] flex-1 flex-col items-center gap-1 sm:gap-2">
                   <div className="relative w-full">
                     <div
                       className="w-full rounded-t-lg bg-gradient-to-t from-blue-600 to-blue-400 transition-all"
                       style={{ height: `${Math.max(height, 4)}px` }}
                     />
                   </div>
-                  <p className="text-xs font-semibold text-gray-400">
+                  <p className="text-[9px] font-semibold text-gray-400 sm:text-xs">
                     {String(hourStart).padStart(2, '0')}:00
                   </p>
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Báo cáo gần đây */}
-      <div className="rounded-2xl border border-[#E8E8EC] bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900">Báo cáo gần đây</h2>
+      <div className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm sm:p-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <h2 className="text-base font-bold text-gray-900 sm:text-lg">Báo cáo gần đây</h2>
           <button
             type="button"
             className="text-xs font-semibold text-blue-600 transition hover:underline"
@@ -1063,8 +1095,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Footer */}
-      <div className="flex flex-col items-center justify-between gap-2 px-1 pb-2 text-sm text-gray-400 sm:flex-row">
-        <span>© 2024 GUARDIAN RESPONSE SYSTEM • BẢO MẬT TUYỆT ĐỐI</span>
+      <div className="flex flex-col items-center justify-between gap-2 px-1 pb-2 text-center text-xs text-gray-400 sm:flex-row sm:text-left sm:text-sm">
+        <span className="max-w-full text-pretty">© 2024 GUARDIAN RESPONSE SYSTEM • BẢO MẬT TUYỆT ĐỐI</span>
         <span className="flex items-center gap-2">
           <span className="inline-block size-1.5 rounded-full bg-green-500" />
           HỆ THỐNG ỔN ĐỊNH · V.2.4.0-STABLE

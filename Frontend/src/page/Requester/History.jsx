@@ -234,6 +234,7 @@ export default function HistoryPage() {
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showSupportModal, setShowSupportModal] = useState(false);
 
   const closedHistory = history.filter((item) => {
     const key = normalizeStatus(item.status);
@@ -297,7 +298,7 @@ export default function HistoryPage() {
   return (
     <div className="h-screen overflow-hidden flex flex-col" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <header className="bg-white border-b border-gray-100 w-full sticky top-0 z-30">
-        <Header />
+        <Header clearVictimProfile={clearVictimProfile} logoutVictimFirebase={logoutVictimFirebase} />
       </header>
 
       <div className="flex flex-1 overflow-hidden min-h-0">
@@ -329,7 +330,10 @@ export default function HistoryPage() {
             </nav>
           </div>
           <div className="px-3 pb-5 flex flex-col gap-0.5">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 cursor-pointer hover:text-gray-600 hover:bg-gray-50 transition">
+            <div 
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 cursor-pointer hover:text-gray-600 hover:bg-gray-50 transition"
+              onClick={() => setShowSupportModal(true)}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" />
@@ -485,6 +489,46 @@ export default function HistoryPage() {
 
       {selectedItem && (
         <HistoryDetailModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+      )}
+
+      {/* SUPPORT MODAL (Nạn nhân) */}
+      {showSupportModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[99999] p-4" onClick={() => setShowSupportModal(false)} style={{ zIndex: 999999 }}>
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-white font-bold text-lg">Hướng dẫn sử dụng</h3>
+              <button onClick={() => setShowSupportModal(false)} className="text-white/80 hover:text-white transition">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <h4 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span> 
+                  Trang chủ (Gửi SOS)
+                </h4>
+                <p className="text-xs text-gray-600 pl-8 leading-relaxed">Nhấn nút SOS khẩn cấp khi gặp sự cố. Hệ thống sẽ tự động xác định vị trí và phân phối tín hiệu đến đội cứu hộ gần nhất.</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">2</span> 
+                  Thông tin cá nhân
+                </h4>
+                <p className="text-xs text-gray-600 pl-8 leading-relaxed">Nơi bạn cập nhật hồ sơ y tế (bệnh nền, dị ứng, nhóm máu) và liên hệ khẩn cấp. Dữ liệu này giúp cứu hộ phản ứng hiệu quả hơn.</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">3</span> 
+                  Lịch sử cứu trợ
+                </h4>
+                <p className="text-xs text-gray-600 pl-8 leading-relaxed">Xem lại danh sách các tình huống khẩn cấp bạn đã tạo, đánh giá và theo dõi trạng thái xử lý.</p>
+              </div>
+            </div>
+            <div className="px-6 pb-6 pt-2">
+              <button onClick={() => setShowSupportModal(false)} className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition">Đã hiểu</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

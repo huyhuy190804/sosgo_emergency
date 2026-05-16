@@ -11,6 +11,10 @@ export default function AdminLayout() {
   const [position, setPosition] = useState(null);
   const [sending, setSending] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+  const openMobileMenu = useCallback(() => setMobileMenuOpen(true), []);
 
   const handleReportClick = useCallback(() => {
     if (!navigator.geolocation) {
@@ -86,10 +90,10 @@ export default function AdminLayout() {
 
   return (
     <div className="flex min-h-dvh bg-brand-gray-bg">
-      <AdminSidebar onReportClick={handleReportClick} gpsLoading={gpsLoading} />
+      <AdminSidebar mobileOpen={mobileMenuOpen} onMobileClose={closeMobileMenu} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <AdminTopBar />
-        <main className="flex-1 overflow-auto">
+        <AdminTopBar onMenuClick={openMobileMenu} />
+        <main className="flex-1 overflow-auto pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
           <Outlet />
         </main>
       </div>

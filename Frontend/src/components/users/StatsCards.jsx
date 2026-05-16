@@ -8,16 +8,16 @@ const StatsCards = ({ stats }) => {
     ];
   
     return (
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {data.map((item, i) => (
           <div
             key={i}
-            className="bg-white p-4 rounded-xl border shadow-sm"
+            className="rounded-xl border bg-white p-4 shadow-sm"
           >
-            <p className="text-gray-400 text-xs">
+            <p className="min-h-8 text-xs font-medium uppercase leading-4 text-gray-400 sm:min-h-0">
               {item.title}
             </p>
-            <h2 className="text-xl font-semibold">
+            <h2 className="mt-1 text-2xl font-semibold leading-none text-gray-900 sm:text-xl">
               {item.value}
             </h2>
           </div>

@@ -35,15 +35,8 @@ const UsersPage = () => {
 
     //dùng 1 state
     const [selectedUser, setSelectedUser] = useState(null);
-
-    const handleView = (user) => {
-    setSelectedUser(user);
-    setOpenDetail(true);
-    };
   
     useEffect(() => {
-      setLoading(true);
-  
       api
         .get("/users")
         .then((res) => setUsers(extractUserList(res)))
@@ -132,23 +125,27 @@ const UsersPage = () => {
     };
 
     return (
-      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      <div className="min-h-screen space-y-4 bg-gray-50 px-4 py-4 sm:p-6 sm:space-y-6">
         
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">
-              Quản lý Người dùng Đà Nẵng
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold text-gray-950 sm:text-2xl">
+              <span className="sm:hidden">Quản lý người dùng</span>
+              <span className="hidden sm:inline">Quản lý Người dùng Đà Nẵng</span>
             </h1>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="mt-1 text-sm font-medium text-gray-500 sm:hidden">
+              Đà Nẵng
+            </p>
+            <p className="mt-1 hidden text-sm text-gray-500 sm:block">
               Giám sát và phân quyền lực lượng tham gia cứu hộ tại địa bàn thành phố.
             </p>
           </div>
   
-          <div className="flex gap-3">
+          <div className="flex gap-3 sm:shrink-0">
           
             <button
               onClick={() => setOpenDrawer(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+              className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 sm:w-auto sm:py-2"
               >
               + Thêm người dùng
             </button>

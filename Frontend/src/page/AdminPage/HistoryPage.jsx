@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ClipboardList, Clock, CheckCircle2, Search } from 'lucide-react';
+import { CalendarDays, ClipboardList, Clock, CheckCircle2, MapPin, Search, Users } from 'lucide-react';
 import { getAdminPaginationItems } from '@/lib/adminPagination';
 import { cn } from '@/lib/utils';
 import { formatSosCode, getIncidentTypeDisplay } from '@/constants/incidentMeta';
@@ -20,15 +20,6 @@ function normalizeStatus(s) {
   return String(s ?? '').toUpperCase();
 }
 
-function formatDateTime(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return d.toLocaleString('vi-VN', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  });
-}
-
 function formatDateTimeShort(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -37,6 +28,18 @@ function formatDateTimeShort(iso) {
     '\n' +
     d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
   );
+}
+
+function formatTimeOnly(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDateOnly(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('vi-VN', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+  });
 }
 
 /** Tính thời điểm kết thúc từ status_history */
@@ -83,21 +86,83 @@ function StatusBadge({ status }) {
 
 function StatCard({ icon, label, value, sub, subColor, extra }) {
   return (
-    <div className="flex flex-1 items-center justify-between rounded-2xl border border-[#E8E8EC] bg-white px-6 py-5 shadow-sm">
-      <div>
-        <p className="mb-1 text-sm text-gray-500">{label}</p>
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
+    <div className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl border border-[#E8E8EC] bg-white px-4 py-4 shadow-sm sm:px-6 sm:py-5">
+      <div className="min-w-0">
+        <p className="mb-1 text-sm font-medium text-gray-500">{label}</p>
+        <p className="text-3xl font-bold leading-tight text-gray-900">{value}</p>
         {sub && (
-          <p className={cn('mt-1 flex items-center gap-1 text-xs font-medium', subColor ?? 'text-gray-500')}>
+          <p className={cn('mt-1 flex items-center gap-1 text-xs font-medium leading-snug', subColor ?? 'text-gray-500')}>
             {sub}
           </p>
         )}
         {extra}
       </div>
-      <div className="flex size-12 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+      <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
         {icon}
       </div>
     </div>
+  );
+}
+
+function HistoryMobileCard({ sos }) {
+  const code = formatSosCode(sos._id);
+  const { label: typeLabel, Icon, emoji } = getIncidentTypeDisplay(sos.incident_type);
+  const rescue = typeof sos.assigned_rescue_id === 'object'
+    ? sos.assigned_rescue_id?.full_name
+    : null;
+  const endTime = getEndTime(sos);
+  const duration = getDuration(sos);
+  const timeRange = `${formatTimeOnly(sos.created_at)} - ${formatTimeOnly(endTime)}`;
+
+  return (
+    <article className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm">
+      <div className="flex gap-3">
+        <div className="w-[5.25rem] shrink-0">
+          <span className="break-words font-mono text-sm font-bold leading-6 text-blue-600">
+            {code}
+          </span>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+              {emoji ? (
+                <span className="text-sm leading-none">{emoji}</span>
+              ) : (
+                <Icon className="size-3.5" aria-hidden />
+              )}
+            </span>
+            <h3 className="truncate text-base font-bold text-gray-900">{typeLabel}</h3>
+          </div>
+
+          <div className="mt-2 grid gap-1.5 text-sm text-gray-600">
+            <div className="flex min-w-0 items-center gap-2">
+              <MapPin className="size-4 shrink-0 text-gray-500" aria-hidden />
+              <span className="truncate">{sos.address || '—'}</span>
+            </div>
+            <div className="flex min-w-0 items-center gap-2">
+              <Users className="size-4 shrink-0 text-gray-500" aria-hidden />
+              <span className="truncate">{rescue || '—'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="ml-1 flex shrink-0 flex-col items-end gap-2 text-right">
+          <div className="grid gap-1 text-sm text-gray-600">
+            <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+              <Clock className="size-4 text-gray-500" aria-hidden />
+              {timeRange}
+            </span>
+            <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+              <CalendarDays className="size-4 text-gray-500" aria-hidden />
+              {formatDateOnly(sos.created_at)}
+            </span>
+          </div>
+          <p className="text-base font-bold text-gray-900">{duration}</p>
+          <StatusBadge status={sos.status} />
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -138,6 +203,7 @@ export default function HistoryPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- load() fetches remote history and owns loading/error state.
   useEffect(() => { load(); }, [load]);
 
   function handleApplyFilter() {
@@ -224,14 +290,16 @@ export default function HistoryPage() {
         'text-[15px] leading-relaxed sm:text-base sm:leading-normal',
         '[&_.text-xs]:text-sm [&_.text-sm]:text-base [&_.text-base]:text-lg',
         '[&_.text-lg]:text-xl [&_.text-xl]:text-2xl [&_.text-2xl]:text-3xl [&_.text-3xl]:text-4xl [&_.text-4xl]:text-5xl',
-        'w-full space-y-6 px-6 py-8',
+        'w-full space-y-4 px-4 py-5 sm:space-y-6 sm:px-6 sm:py-8',
       )}
     >
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-900">Lịch sử sự cố</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-2xl sm:tracking-normal">
+        Lịch sử sự cố
+      </h1>
 
       {/* Stats */}
-      <div className="flex flex-col gap-4 lg:flex-row">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 lg:flex lg:flex-row">
         <StatCard
           icon={<ClipboardList className="size-6" />}
           label="Tổng số nhiệm vụ"
@@ -252,7 +320,7 @@ export default function HistoryPage() {
           sub={`${resolvedRows.length} hoàn thành / ${cancelledRows.length} đã hủy`}
           subColor="text-blue-600"
           extra={
-            <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-gray-100">
+            <div className="mt-2 h-1.5 w-full max-w-40 overflow-hidden rounded-full bg-gray-100">
               <div
                 className="h-full rounded-full bg-green-500 transition-all"
                 style={{ width: `${completionRate}%` }}
@@ -263,8 +331,8 @@ export default function HistoryPage() {
       </div>
 
       {/* Filter */}
-      <div className="rounded-2xl border border-[#E8E8EC] bg-white p-5 shadow-sm">
-        <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-700">
+      <div className="rounded-2xl border border-[#E8E8EC] bg-white p-4 shadow-sm sm:p-5">
+        <div className="mb-4 flex items-center gap-2 text-base font-bold text-gray-900 sm:text-sm sm:font-semibold sm:text-gray-700">
           <Search className="size-4 text-gray-400" />
           Bộ lọc tìm kiếm
         </div>
@@ -278,7 +346,7 @@ export default function HistoryPage() {
               placeholder="VD: SOS-2023..."
               value={idFilter}
               onChange={(e) => setIdFilter(e.target.value)}
-              className="h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200"
+              className="h-11 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200 sm:h-10"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -288,7 +356,7 @@ export default function HistoryPage() {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200"
+              className="h-11 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200 sm:h-10"
             >
               {typeOptions.map((o) => (
                 <option key={o.value || 'all'} value={o.value}>{o.label}</option>
@@ -303,7 +371,7 @@ export default function HistoryPage() {
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200"
+              className="h-11 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200 sm:h-10"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -313,7 +381,7 @@ export default function HistoryPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200"
+              className="h-11 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200 sm:h-10"
             >
               {STATUS_OPTIONS.map((o) => (
                 <option key={o.value || 'all'} value={o.value}>{o.label}</option>
@@ -325,7 +393,7 @@ export default function HistoryPage() {
           <button
             type="button"
             onClick={handleApplyFilter}
-            className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 sm:w-auto sm:py-2.5"
           >
             <Search className="size-4" />
             Áp dụng bộ lọc
@@ -334,7 +402,36 @@ export default function HistoryPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-[#E8E8EC] bg-white shadow-sm">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <h2 className="text-lg font-bold text-gray-900">Danh sách sự cố</h2>
+          <span className="text-sm text-gray-500 sm:hidden">
+            {filtered.length.toLocaleString('vi-VN')} sự cố
+          </span>
+        </div>
+
+        <div className="grid gap-3 md:hidden">
+          {loading && (
+            <div className="rounded-2xl border border-[#E8E8EC] bg-white py-10 text-center text-sm text-gray-400 shadow-sm">
+              Đang tải dữ liệu...
+            </div>
+          )}
+          {!loading && error && (
+            <div className="rounded-2xl border border-[#E8E8EC] bg-white py-10 text-center text-sm text-red-500 shadow-sm">
+              {error}
+            </div>
+          )}
+          {!loading && !error && pageSlice.length === 0 && (
+            <div className="rounded-2xl border border-[#E8E8EC] bg-white py-10 text-center text-sm text-gray-400 shadow-sm">
+              Không có dữ liệu phù hợp.
+            </div>
+          )}
+          {!loading && !error && pageSlice.map((sos) => (
+            <HistoryMobileCard key={sos._id} sos={sos} />
+          ))}
+        </div>
+
+      <div className="overflow-hidden rounded-2xl border border-[#E8E8EC] bg-white shadow-sm max-md:hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] border-collapse text-left text-sm">
             <thead>
@@ -421,6 +518,7 @@ export default function HistoryPage() {
             </tbody>
           </table>
         </div>
+      </div>
 
         {/* Pagination */}
         <div className="flex flex-col items-center justify-between gap-3 border-t border-[#E8E8EC] px-5 py-3.5 sm:flex-row">

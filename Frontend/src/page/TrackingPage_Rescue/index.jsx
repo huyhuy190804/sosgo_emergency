@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CompletionPopup from "@/components/ui/CompletionPopup";
-import  infoIcon from "../../assets/info.svg";
+import infoIcon from "../../assets/info.svg";
+import rescueLogo from "@/assets/logorescue.svg";
 
 import { getSosDetail } from "@/services/api/apiSos";
 import { getCurrentTracking, updateRescueLocation, updateRescueStage } from "@/services/api/apiTracking";
@@ -522,6 +523,22 @@ export default function TrackingView() {
 
   return (
     <div className="h-screen w-full bg-gray-50 flex flex-col overflow-hidden font-sans">
+      <header className="w-full bg-white border-b border-gray-100 shadow-sm z-40 shrink-0">
+        <div className="mx-auto px-5 h-[64px] flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate("/responder")} className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer">
+              <img src={rescueLogo} alt="Rescue Home" className="h-[100px] w-auto object-contain" />
+            </button>
+            <button onClick={() => navigate("/responder")} className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition ml-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Trang chủ
+            </button>
+          </div>
+        </div>
+      </header>
+
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <AnimatePresence>
           {toaster && <Toast {...toaster} onClose={() => setToaster(null)} />}

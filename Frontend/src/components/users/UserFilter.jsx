@@ -13,7 +13,7 @@ export default function UserFilter({ onFilter }) {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm mb-4 flex flex-wrap gap-3">
+    <div className="mb-4 flex flex-col gap-3 rounded-xl border bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:rounded-lg">
       
       {/* SEARCH */}
       <input
@@ -21,14 +21,14 @@ export default function UserFilter({ onFilter }) {
         placeholder="Tìm kiếm theo tên hoặc số điện thoại"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        className="border px-3 py-2 rounded w-64"
+        className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-64 sm:py-2"
       />
 
       {/* ROLE */}
       <select
         value={role}
         onChange={(e) => setRole(e.target.value)}
-        className="border px-3 py-2 rounded"
+        className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-auto sm:py-2"
       >
         <option value="">Tất cả vai trò</option>
         <option value="Admin">Admin</option>
@@ -41,7 +41,7 @@ export default function UserFilter({ onFilter }) {
       <select
         value={ward}
         onChange={(e) => setWard(e.target.value)}
-        className="border px-3 py-2 rounded"
+        className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-auto sm:py-2"
       >
         <option value="">Tất cả Phường</option>
 
@@ -55,7 +55,7 @@ export default function UserFilter({ onFilter }) {
       {/* BUTTON */}
       <button
         onClick={handleFilter}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto sm:py-2"
       >
         Lọc
       </button>

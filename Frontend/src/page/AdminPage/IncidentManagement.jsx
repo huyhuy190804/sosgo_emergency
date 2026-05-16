@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { formatSosCode, getIncidentTypeDisplay } from '@/constants/incidentMeta';
 import { getAllSos } from '@/services/api/apiSos';
 import IncidentDetailModal from './IncidentDetailModal';
+import IncidentManagementMobileSection from './IncidentManagementMobileSection';
 import {
   deriveIncidentPriority,
   incidentPriorityTableBadgeClass,
@@ -112,6 +113,7 @@ export default function IncidentManagement() {
   const [timeFilter, setTimeFilter] = useState('');
   const [page, setPage] = useState(1);
   const [detailSos, setDetailSos] = useState(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -190,10 +192,36 @@ export default function IncidentManagement() {
         'text-[15px] leading-relaxed sm:text-base sm:leading-normal',
         '[&_.text-xs]:text-sm [&_.text-sm]:text-base [&_.text-base]:text-lg',
         '[&_.text-lg]:text-xl [&_.text-xl]:text-2xl [&_.text-2xl]:text-3xl [&_.text-3xl]:text-4xl [&_.text-4xl]:text-5xl',
-        'w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8',
+        'w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8',
       )}
     >
-      <div className="mx-auto w-full max-w-none space-y-6">
+      <IncidentManagementMobileSection
+        activeCount={activeCount}
+        systemLoad={systemLoad}
+        search={search}
+        onSearchChange={setSearch}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        priorityFilter={priorityFilter}
+        onPriorityFilterChange={setPriorityFilter}
+        timeFilter={timeFilter}
+        onTimeFilterChange={setTimeFilter}
+        showFilters={showMobileFilters}
+        onShowFiltersChange={setShowMobileFilters}
+        onApplyFilters={load}
+        loading={loading}
+        error={error}
+        pageSlice={pageSlice}
+        filteredLength={filtered.length}
+        safePage={safePage}
+        totalPages={totalPages}
+        pagesArr={pagesArr}
+        onPageChange={setPage}
+        pageSize={PAGE_SIZE}
+        onViewIncident={setDetailSos}
+      />
+
+      <div className="mx-auto hidden w-full max-w-none space-y-6 lg:block">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-black">
